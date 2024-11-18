@@ -59,6 +59,32 @@ main(int argc, char *argv[])
 }
 ```
 
+A similar program on Linux would look like this:
+```c
+#include <unistd.h>    // For fork()
+#include <sys/types.h> // For pid_t
+#include <stdio.h>     // For printf(), perror()
+#include <stdlib.h>    // For exit()
+
+int main() {
+    pid_t pid = fork(); // Create a new process
+
+    if (pid < 0) {
+        // Error occurred
+        perror("fork failed");
+        exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+        // Child process
+        printf("Hello from the child process! PID: %d\n", getpid());
+    } else {
+        // Parent process
+        printf("Hello from the parent process! PID: %d, Child PID: %d\n", getpid(), pid);
+    }
+
+    return 0;
+}
+```
+
 ### 3. Code Explanation
 
 Let's break down the key components:
