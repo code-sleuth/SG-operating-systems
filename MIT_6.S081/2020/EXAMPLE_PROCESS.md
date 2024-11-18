@@ -39,9 +39,7 @@ Add the following code to `example_process.c`:
 // SPDX-License-Identifier: MIT
 
 #include "kernel/types.h"
-#include "kernel/stat.h"
 #include "user/user.h"
-#include "kernel/fs.h"
 
 int
 main(int argc, char *argv[])
@@ -58,7 +56,6 @@ main(int argc, char *argv[])
     } else {
         printf("fork error\n");
     }
-    exit(0);  // Ensure parent exits
 }
 ```
 
@@ -68,9 +65,7 @@ Let's break down the key components:
 
 1. **Header Files**:
    - `kernel/types.h`: Basic type definitions
-   - `kernel/stat.h`: File status structures
    - `user/user.h`: User-space system calls
-   - `kernel/fs.h`: File system structures
 
 2. **Process Creation**:
    - `fork()`: Creates a new process by duplicating the calling process
