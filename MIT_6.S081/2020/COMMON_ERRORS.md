@@ -37,86 +37,22 @@ This means any warnigs that would normally just display a message will instead c
 
 2. Make the following file changes to it:
 
-```C
+```bash
+diff --git a/user/sh.c b/user/sh.c
+index 83dd513..7f93bb2 100644
+--- a/user/sh.c
++++ b/user/sh.c
 // Execute cmd.  Never returns.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Winfinite-recursion"
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Winfinite-recursion"
 void
 runcmd(struct cmd *cmd)
 {
-  int p[2];
-  struct backcmd *bcmd;
-  struct execcmd *ecmd;
-  struct listcmd *lcmd;
-  struct pipecmd *pcmd;
-  struct redircmd *rcmd;
-
-  if(cmd == 0)
-    exit(1);
-
-  switch(cmd->type){
-  default:
-    panic("runcmd");
-
-  case EXEC:
-    ecmd = (struct execcmd*)cmd;
-    if(ecmd->argv[0] == 0)
-      exit(1);
-    exec(ecmd->argv[0], ecmd->argv);
-    fprintf(2, "exec %s failed\n", ecmd->argv[0]);
-    break;
-
-  case REDIR:
-    rcmd = (struct redircmd*)cmd;
-    close(rcmd->fd);
-    if(open(rcmd->file, rcmd->mode) < 0){
-      fprintf(2, "open %s failed\n", rcmd->file);
-      exit(1);
-    }
-    runcmd(rcmd->cmd);
-    break;
-
-  case LIST:
-    lcmd = (struct listcmd*)cmd;
-    if(fork1() == 0)
-      runcmd(lcmd->left);
-    wait(0);
-    runcmd(lcmd->right);
-    break;
-
-  case PIPE:
-    pcmd = (struct pipecmd*)cmd;
-    if(pipe(p) < 0)
-      panic("pipe");
-    if(fork1() == 0){
-      close(1);
-      dup(p[1]);
-      close(p[0]);
-      close(p[1]);
-      runcmd(pcmd->left);
-    }
-    if(fork1() == 0){
-      close(0);
-      dup(p[0]);
-      close(p[0]);
-      close(p[1]);
-      runcmd(pcmd->right);
-    }
-    close(p[0]);
-    close(p[1]);
-    wait(0);
-    wait(0);
-    break;
-
-  case BACK:
-    bcmd = (struct backcmd*)cmd;
-    if(fork1() == 0)
-      runcmd(bcmd->cmd);
-    break;
+@@ -129,6 +131,7 @@ runcmd(struct cmd *cmd)
   }
   exit(0);
 }
-#pragma GCC diagnostic pop
++#pragma GCC diagnostic pop
 ```
 
 The key changes are:
